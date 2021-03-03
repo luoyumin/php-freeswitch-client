@@ -1,0 +1,25 @@
+{
+    "name": "swoole/free_switch-client",
+    "description": "基于swoole做的FreeSWTICH tcp 客户端",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.2",
+        "ext-swoole": ">=4.5"
+    },
+    "require-dev": {
+        "swoole/ide-helper": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "FreeSwitch\\": "src"
+        },
+        "files": [
+            "publish/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FreeSwitch\\": "src"
+        }
+    }
+}
