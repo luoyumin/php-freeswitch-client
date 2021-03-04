@@ -6,7 +6,7 @@ namespace FreeSwitch\Connection;
 
 use FreeSwitch\Event\EventHandleInterface;
 use FreeSWITCH\Exception\InvalidFreeSwitchConnectionException;
-use FreeSWITCH\Tool\Context;
+use FreeSWITCH\Tool\SwContext;
 use Swoole\Coroutine\Client;
 
 /**
@@ -125,8 +125,8 @@ class FreeSwitchConnection
      */
     public function reEvent()
     {
-        if (Context::has('events')) {
-            foreach (Context::get('events') as $event => $sorts) {
+        if (SwContext::has('events')) {
+            foreach (SwContext::get('events') as $event => $sorts) {
                 $this->event($sorts, $event);
             }
         }
@@ -137,8 +137,8 @@ class FreeSwitchConnection
      */
     public function reFilterUuid()
     {
-        if (Context::has('filter_unique_ids')) {
-            foreach (Context::get('filter_unique_ids') as $filter_unique_id) {
+        if (SwContext::has('filter_unique_ids')) {
+            foreach (SwContext::get('filter_unique_ids') as $filter_unique_id) {
                 $this->filterUuid($filter_unique_id);
             }
         }

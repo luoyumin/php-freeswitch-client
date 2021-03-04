@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace FreeSWITCH\Tool;
+namespace FreeSwitch\Tool;
 
 use Swoole\Coroutine;
 
 /**
  * Class Context
- * @package FreeSWITCH\tool
+ * @package FreeSwitch\Tool
  */
-class Context
+class SwContext
 {
     protected static $nonCoContext = [];
 

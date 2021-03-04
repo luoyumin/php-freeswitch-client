@@ -3,7 +3,7 @@
 namespace FreeSwitch\Connection;
 
 use FreeSwitch\Event\EventHandleInterface;
-use FreeSWITCH\Tool\Context;
+use FreeSWITCH\Tool\SwContext;
 use Swoole\Coroutine\{Client, System};
 
 /**
@@ -127,11 +127,11 @@ trait Api
      */
     public function event(string $sorts = 'plain', string $args = '')
     {
-        $events = Context::get('events') ?? [];
+        $events = SwContext::get('events') ?? [];
 
         $events[$args] = $sorts;
 
-        Context::set('events', $events);
+        SwContext::set('events', $events);
 
         if (!$this->send(sprintf("event %s %s", $sorts, $args))) return false;
 
@@ -139,7 +139,7 @@ trait Api
 
             $this->event_handle_object instanceof EventHandleInterface && $this->event_handle_object->process(recv_to_array($this->getContentByContentLength()));
 
-            if (Context::get('end_listen_event')) break;
+            if (SwContext::get('end_listen_event')) break;
 
             System::sleep(1);
         }
@@ -153,11 +153,11 @@ trait Api
      */
     public function filterUuid(string $uuid)
     {
-        $filter_unique_ids = Context::get('filter_unique_ids') ?? [];
+        $filter_unique_ids = SwContext::get('filter_unique_ids') ?? [];
 
         array_push($filter_unique_ids, $uuid);
 
-        Context::set('filter_unique_ids', $filter_unique_ids);
+        SwContext::set('filter_unique_ids', $filter_unique_ids);
 
         if ($this->send(sprintf("filter Unique-ID %s", $uuid))) {
             return $this->getContentByContentLength();
@@ -177,9 +177,9 @@ trait Api
         $content_length = 0;
 
         while (true) {
-            if ($recv == '' && Context::get('more_than')) {
-                $recv = Context::get('more_than');
-                Context::set('more_than', null);
+            if ($recv == '' && SwContext::get('more_than')) {
+                $recv = SwContext::get('more_than');
+                SwContext::set('more_than', null);
             }
 
             $package = $this->getConnection()->connection->recv();
@@ -203,7 +203,7 @@ trait Api
                     continue;
                 } else {
                     $more_than = substr($recv, strpos($recv, $result) + strlen($result));
-                    $more_than && Context::set('more_than', $more_than); // 存储未处理的数据
+                    $more_than && SwContext::set('more_than', $more_than); // 存储未处理的数据
                     return $result;
                 }
             } else {

@@ -6,7 +6,7 @@ namespace FreeSwitch;
 
 use FreeSwitch\Connection\FreeSwitchConnection;
 use FreeSWITCH\Exception\InvalidFreeSwitchConnectionException;
-use FreeSWITCH\Tool\Context;
+use FreeSWITCH\Tool\SwContext;
 
 /**
  * Class FreeSwitch
@@ -41,7 +41,7 @@ class FreeSwitch
      */
     public function __call($name, $arguments)
     {
-        $hasContextConnection = Context::has($this->getContextKey());
+        $hasContextConnection = SwContext::has($this->getContextKey());
         /**
          * @var FreeSwitchConnection
          */
@@ -62,10 +62,10 @@ class FreeSwitch
     {
         $connection = null;
         if ($hasContextConnection) {
-            $connection = Context::get($this->getContextKey());
+            $connection = SwContext::get($this->getContextKey());
         }
         if (!($connection instanceof FreeSwitchConnection)) {
-            $connection = Context::set($this->getContextKey(), new FreeSwitchConnection($this->config));
+            $connection = SwContext::set($this->getContextKey(), new FreeSwitchConnection($this->config));
         }
         if (!$connection instanceof FreeSwitchConnection) {
             throw new InvalidFreeSwitchConnectionException('The connection is not a valid FreeSwitchConnection.');
