@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace FreeSwitch\Connection;
 
+use FreeSwitch\Event\EventHandleInterface;
 use FreeSWITCH\Exception\InvalidFreeSwitchConnectionException;
+use FreeSWITCH\Tool\Context;
 use Swoole\Coroutine\Client;
 
 /**
@@ -13,6 +15,11 @@ use Swoole\Coroutine\Client;
  */
 class FreeSwitchConnection
 {
+    /**
+     * @var EventHandleInterface
+     */
+    protected $event_handle_object;
+
     use Api;
 
     /**
@@ -111,6 +118,46 @@ class FreeSwitchConnection
         $this->reFilterUuid(); // 重新过滤UUID
 
         return true;
+    }
+
+    /**
+     * 重新监听事件
+     */
+    public function reEvent()
+    {
+        if (Context::has('events')) {
+            foreach (Context::get('events') as $event => $sorts) {
+                $this->event($sorts, $event);
+            }
+        }
+    }
+
+    /**
+     * 重新过滤UUID
+     */
+    public function reFilterUuid()
+    {
+        if (Context::has('filter_unique_ids')) {
+            foreach (Context::get('filter_unique_ids') as $filter_unique_id) {
+                $this->filterUuid($filter_unique_id);
+            }
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getErrCode()
+    {
+        return $this->connection->errCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrMsg()
+    {
+        return $this->connection->errMsg;
     }
 
     /**
