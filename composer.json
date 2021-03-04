@@ -2,6 +2,12 @@
     "name": "FreeSWITCH-client",
     "description": "基于swoole做的FreeSWTICH tcp 客户端",
     "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "jinanv666",
+            "email": "1326944332@qq.com"
+        }
+    ],
     "require": {
         "php": ">=7.2",
         "ext-swoole": ">=4.5"
