@@ -1,5 +1,5 @@
 {
-    "name": "freeswitch/client",
+    "name": "freeswitch/php-client",
     "description": "基于swoole做的FreeSWTICH tcp 客户端",
     "minimum-stability": "dev",
     "authors": [
