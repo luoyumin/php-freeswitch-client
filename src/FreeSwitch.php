@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace FreeSwitch;
 
 use FreeSwitch\Connection\FreeSwitchConnection;
-use FreeSWITCH\Exception\InvalidFreeSwitchConnectionException;
-use FreeSWITCH\Tool\SwContext;
+use FreeSwitch\Exception\InvalidFreeSwitchConnectionException;
+use FreeSwitch\Tool\SwContext;
 
 /**
  * Class FreeSwitch
