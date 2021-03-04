@@ -2,6 +2,7 @@
     "name": "freeswitch/php-client",
     "description": "基于swoole做的FreeSWTICH tcp 客户端",
     "minimum-stability": "dev",
+    "license": "MIT",
     "authors": [
         {
             "name": "LUOYUMIN",
@@ -11,9 +12,6 @@
     "require": {
         "php": ">=7.2",
         "ext-swoole": ">=4.5"
-    },
-    "require-dev": {
-        "swoole/ide-helper": "dev-master"
     },
     "autoload": {
         "psr-4": {
