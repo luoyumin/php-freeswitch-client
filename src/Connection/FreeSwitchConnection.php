@@ -191,4 +191,12 @@ class FreeSwitchConnection
 
         return true;
     }
+
+    /**
+     * @param EventHandleInterface $eventHandle
+     */
+    public function setEventHandleObject(EventHandleInterface $eventHandle)
+    {
+        $this->event_handle_object = $eventHandle;
+    }
 }
