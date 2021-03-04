@@ -1,5 +1,5 @@
 {
-    "name": "FreeSWITCH-client",
+    "name": "FreeSWITCH/client",
     "description": "基于swoole做的FreeSWTICH tcp 客户端",
     "minimum-stability": "dev",
     "authors": [
