@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace FreeSwitch\Connection;
 
-use FreeSwitch\Event\EventHandleInterface;
-use FreeSWITCH\Exception\InvalidFreeSwitchConnectionException;
-use FreeSWITCH\Tool\SwContext;
+use FreeSwitch\Exception\InvalidFreeSwitchConnectionException;
+use FreeSwitch\Tool\SwContext;
 use Swoole\Coroutine\Client;
 
 /**
@@ -15,11 +14,6 @@ use Swoole\Coroutine\Client;
  */
 class FreeSwitchConnection
 {
-    /**
-     * @var EventHandleInterface
-     */
-    protected $event_handle_object;
-
     use Api;
 
     /**
@@ -187,16 +181,10 @@ class FreeSwitchConnection
      */
     public function close(): bool
     {
+        $this->connection->close();
+
         unset($this->connection);
 
         return true;
-    }
-
-    /**
-     * @param EventHandleInterface $eventHandle
-     */
-    public function setEventHandleObject(EventHandleInterface $eventHandle)
-    {
-        $this->event_handle_object = $eventHandle;
     }
 }

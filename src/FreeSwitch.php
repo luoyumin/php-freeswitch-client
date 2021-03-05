@@ -6,7 +6,6 @@ namespace FreeSwitch;
 
 use FreeSwitch\Connection\FreeSwitchConnection;
 use FreeSwitch\Exception\InvalidFreeSwitchConnectionException;
-use FreeSwitch\Tool\SwContext;
 
 /**
  * Class FreeSwitch
@@ -16,21 +15,20 @@ use FreeSwitch\Tool\SwContext;
 class FreeSwitch
 {
     /**
-     * @var string
-     */
-    protected $name;
-
-    /**
      * @var array
      */
     protected $config;
 
-    public function __construct(string $name = 'default', array $config = [])
+    /**
+     * @var FreeSwitchConnection
+     */
+    protected $connection;
+
+    public function __construct(array $config = [])
     {
 
-        $this->name = $name;
-
         $this->config = $config;
+
     }
 
     /**
@@ -41,11 +39,10 @@ class FreeSwitch
      */
     public function __call($name, $arguments)
     {
-        $hasContextConnection = SwContext::has($this->getContextKey());
         /**
          * @var FreeSwitchConnection
          */
-        $connection = $this->getConnection($hasContextConnection);
+        $connection = $this->getConnection();
 
         $connection = $connection->getConnection();
 
@@ -54,30 +51,17 @@ class FreeSwitch
     }
 
     /**
-     * @param $hasContextConnection
      * @return FreeSwitchConnection
      * @throws InvalidFreeSwitchConnectionException
      */
-    private function getConnection($hasContextConnection): FreeSwitchConnection
+    private function getConnection(): FreeSwitchConnection
     {
-        $connection = null;
-        if ($hasContextConnection) {
-            $connection = SwContext::get($this->getContextKey());
+        if (!($this->connection instanceof FreeSwitchConnection)) {
+            $this->connection = new FreeSwitchConnection($this->config);
         }
-        if (!($connection instanceof FreeSwitchConnection)) {
-            $connection = SwContext::set($this->getContextKey(), new FreeSwitchConnection($this->config));
-        }
-        if (!$connection instanceof FreeSwitchConnection) {
+        if (!$this->connection instanceof FreeSwitchConnection) {
             throw new InvalidFreeSwitchConnectionException('The connection is not a valid FreeSwitchConnection.');
         }
-        return $connection;
-    }
-
-    /**
-     * The key to identify the connection object in coroutine context.
-     */
-    private function getContextKey(): string
-    {
-        return 'fs.connection';
+        return $this->connection;
     }
 }
