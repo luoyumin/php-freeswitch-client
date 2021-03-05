@@ -3,7 +3,7 @@
 namespace FreeSwitch\Connection;
 
 use FreeSwitch\Event\EventHandleInterface;
-use FreeSWITCH\Tool\SwContext;
+use FreeSwitch\Tool\SwContext;
 use Swoole\Coroutine\{Client, System};
 
 /**
@@ -17,11 +17,24 @@ trait Api
      */
     protected $connection;
 
+    /**
+     * @var EventHandleInterface
+     */
+    protected $event_handle_object;
+
+    /**
+     * @param EventHandleInterface $eventHandle
+     */
+    public function setEventHandleObject(EventHandleInterface $eventHandle)
+    {
+        $this->event_handle_object = $eventHandle;
+    }
+
     protected function send(string $data)
     {
         $data .= "\r\n\r\n";
 
-        if (strlen($data) == $this->connection->send($data)) return true;
+        if (strlen($data) == $this->getActiveConnection()->connection->send($data)) return true;
 
         return false;
     }
@@ -119,6 +132,19 @@ trait Api
     }
 
     /**
+     * @var bool
+     */
+    protected $end_listen_event = false;
+
+    /**
+     * 结束事件监听
+     */
+    public function endListenEvent()
+    {
+        $this->end_listen_event = true;
+    }
+
+    /**
      * 事件监听，依赖于事件机制
      * 此方法会阻塞，这里不会主动退出
      * @param string $sorts
@@ -139,7 +165,7 @@ trait Api
 
             $this->event_handle_object instanceof EventHandleInterface && $this->event_handle_object->process(recv_to_array($this->getContentByContentLength()));
 
-            if (SwContext::get('end_listen_event')) break;
+            if ($this->end_listen_event) break;
 
             System::sleep(1);
         }
@@ -184,7 +210,7 @@ trait Api
 
             $package = $this->getConnection()->connection->recv();
 
-            if ($package === '') $this->connection->close();
+            if ($package === '') $this->close();
 
             $recv .= str_replace(["Content-Type: text/event-xml\n", "Content-Type: text/event-plain\n", "Content-Type: text/event-json\n"], '', (string)$package);
 
@@ -199,7 +225,7 @@ trait Api
 
                 $result = substr($recv, strpos($recv, "Content-Length: $content_length\n"), $substr_len);
 
-                if (strlen($result) < $content_length) {
+                if (strlen($result) < $content_length && $this->connection->isConnected()) {
                     continue;
                 } else {
                     $more_than = substr($recv, strpos($recv, $result) + strlen($result));
@@ -219,7 +245,7 @@ trait Api
      */
     public function peek(int $length = 65535)
     {
-        return $this->connection->peek($length);
+        return $this->getActiveConnection()->connection->peek($length);
     }
 
     /**
