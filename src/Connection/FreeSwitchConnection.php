@@ -59,7 +59,10 @@ class FreeSwitchConnection
      */
     public function check(): bool
     {
-        return $this->connection->isConnected();
+        if (isset($this->connection) && $this->connection instanceof Client) {
+            return $this->connection->isConnected();
+        }
+        return false;
     }
 
     /**
