@@ -6,7 +6,7 @@ namespace FreeSwitch\Connection;
 
 use FreeSwitch\Exception\InvalidFreeSwitchConnectionException;
 use FreeSwitch\Tool\SwContext;
-use Swoole\Coroutine\Client;
+use Swoole\Coroutine\Socket;
 
 /**
  * Class FreeSwitchConnection
@@ -17,9 +17,9 @@ class FreeSwitchConnection
     use Api;
 
     /**
-     * @var Client
+     * @var Socket
      */
-    protected $connection;
+    protected $socket;
 
     /**
      * 配置
@@ -59,8 +59,8 @@ class FreeSwitchConnection
      */
     public function check(): bool
     {
-        if (isset($this->connection) && $this->connection instanceof Client) {
-            return $this->connection->isConnected();
+        if (isset($this->socket) && $this->socket instanceof Socket) {
+            return $this->socket->checkLiveness();
         }
         return false;
     }
@@ -100,15 +100,15 @@ class FreeSwitchConnection
 
         $connection = $this->createFreeSwitch($host, $port, $timeout);
 
-        if ($connection instanceof Client && isset($password) && $password !== '') {
+        if ($connection instanceof Socket && isset($password) && $password !== '') {
             $auth_str = sprintf("auth %s\r\n\r\n", $password);
             if (strlen($auth_str) != $connection->send($auth_str)) return false;
-            while ($recv = $connection->recv()) {
-                if (strpos((string)$recv, 'disconnect') !== false) return false;
+            while ($packet = $connection->recvPacket()) {
+                if (strpos((string)$packet, '+OK') !== false) break;
             }
         }
 
-        $this->connection = $connection;
+        $this->socket = $connection;
 
         $this->reEvent(); // 重新监听事件
 
@@ -146,7 +146,7 @@ class FreeSwitchConnection
      */
     public function getErrCode()
     {
-        return $this->connection->errCode;
+        return $this->socket->errCode;
     }
 
     /**
@@ -154,7 +154,7 @@ class FreeSwitchConnection
      */
     public function getErrMsg()
     {
-        return $this->connection->errMsg;
+        return $this->socket->errMsg;
     }
 
     /**
@@ -162,21 +162,28 @@ class FreeSwitchConnection
      * @param $host
      * @param $port
      * @param $timeout
-     * @return Client
+     * @return Socket
      * @throws InvalidFreeSwitchConnectionException
      */
     protected function createFreeSwitch($host, $port, $timeout)
     {
-        $connection = new Client(SWOOLE_SOCK_TCP);
+        $socket = new Socket(AF_INET, SOCK_STREAM, SOL_TCP);
 
-        if (!$connection->connect($host, $port, $timeout)) {
+        $socket->setProtocol([
+            'open_eof_check' => true, // 验证分包
+            'open_eof_split' => true, // 开启分包
+            'package_eof' => "\n\n", // 包分隔符
+            'package_max_length' => 1024 * 1024 * 2,
+        ]);
 
-            $connection->close();
+        if (!$socket->connect($host, $port, $timeout)) {
+
+            $socket->close();
 
             throw new InvalidFreeSwitchConnectionException('FreeSWITCH connection failed.', $this->getErrCode());
         }
 
-        return $connection;
+        return $socket;
     }
 
     /**
@@ -184,9 +191,9 @@ class FreeSwitchConnection
      */
     public function close(): bool
     {
-        $this->connection->close();
+        $this->socket->close();
 
-        unset($this->connection);
+        unset($this->socket);
 
         return true;
     }
