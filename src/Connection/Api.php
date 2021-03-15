@@ -132,19 +132,6 @@ trait Api
     }
 
     /**
-     * @var bool
-     */
-    protected $end_listen_event = false;
-
-    /**
-     * 结束事件监听
-     */
-    public function endListenEvent()
-    {
-        $this->end_listen_event = true;
-    }
-
-    /**
      * 事件监听，依赖于事件机制
      * 此方法会阻塞，这里不会主动退出
      * @param string $sorts
@@ -163,11 +150,15 @@ trait Api
 
         while (true) {
 
-            $packet_arr = recv_to_array($this->socket->recvPacket());
+            if (!isset($this->socket) || !($this->socket instanceof Socket)) break;
+
+            $packet = $this->socket->recvPacket();
+
+            if (false === $packet) break;
+
+            $packet_arr = recv_to_array((string)$packet);
 
             $this->event_handle_object instanceof EventHandleInterface && $this->event_handle_object->process($packet_arr);
-
-            if ($this->end_listen_event) break;
 
             if (empty($packet_arr)) System::sleep(1);
         }
