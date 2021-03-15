@@ -64,4 +64,16 @@ class FreeSwitch
         }
         return $this->connection;
     }
+
+    /**
+     * 关闭链接
+     */
+    public function close()
+    {
+        if ($this->connection instanceof FreeSwitchConnection && $this->connection->check()) {
+            $this->connection->close();
+        }
+
+        $this->connection = null;
+    }
 }
