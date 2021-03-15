@@ -191,7 +191,8 @@ class FreeSwitchConnection
      */
     public function close(): bool
     {
-        $this->socket->close();
+
+        $this->socket instanceof Socket && $this->socket->close();
 
         unset($this->socket);
 
