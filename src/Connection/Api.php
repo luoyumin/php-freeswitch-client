@@ -34,7 +34,7 @@ trait Api
     {
         $data .= "\r\n\r\n";
 
-        if (strlen($data) == $this->getActiveConnection()->socket->send($data)) return true;
+        if ($this->check() && strlen($data) == $this->getActiveConnection()->socket->send($data)) return true;
 
         return false;
     }
