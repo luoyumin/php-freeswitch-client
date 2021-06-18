@@ -335,8 +335,6 @@ class FreeSwitch
 
         $this->enable_filter_callee_uuid && $this->getConnection()->filterUuid($this->callee_uuid);
 
-        var_dump($this->dial_str);
-
         return $this;
     }
 
