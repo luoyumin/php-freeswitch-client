@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FreeSwitch;
 
+use Exception;
 use FreeSwitch\Connection\FreeSwitchConnection;
 use FreeSwitch\Event\EventHandleInterface;
 use FreeSwitch\Event\EventNameConstants;
@@ -297,6 +298,7 @@ class FreeSwitch
      * @return $this
      * @throws InvalidFreeSwitchConnectionException
      * @throws InvalidGatewayException
+     * @throws Exception
      */
     public function startCall(string $caller = null, string $callee = null)
     {
@@ -304,9 +306,9 @@ class FreeSwitch
 
         $callee && $this->setCallee($callee);
 
-        if (!$this->caller) throw new \Exception('Invalid caller number');
+        if (!$this->caller) throw new Exception('Invalid caller number');
 
-        if (!$this->callee) throw new \Exception('Invalid callee number');
+        if (!$this->callee) throw new Exception('Invalid callee number');
 
         // 检测网关可用
         if (!is_null($this->gateway_name) && false === $this->getConnection()->checkGateway($this->gateway_name)) {
@@ -334,6 +336,8 @@ class FreeSwitch
         $this->enable_filter_caller_uuid && $this->getConnection()->filterUuid($this->origination_uuid);
 
         $this->enable_filter_callee_uuid && $this->getConnection()->filterUuid($this->callee_uuid);
+
+        var_dump($this->dial_str);
 
         return $this;
     }
@@ -373,7 +377,9 @@ class FreeSwitch
     }
 
     /**
+     * 注意：这是阻塞的
      * @param EventHandleInterface $eventHandle
+     * @throws InvalidFreeSwitchConnectionException
      */
     public function eventListening(EventHandleInterface $eventHandle)
     {
