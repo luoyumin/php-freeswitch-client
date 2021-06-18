@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FreeSwitch;
 
-use Exception;
 use FreeSwitch\Connection\FreeSwitchConnection;
 use FreeSwitch\Event\EventHandleInterface;
 use FreeSwitch\Event\EventNameConstants;
@@ -109,6 +108,7 @@ class FreeSwitch
     protected $caller;
 
     /**
+     * 设置被叫
      * @param string $caller
      * @return $this
      */
@@ -207,6 +207,7 @@ class FreeSwitch
     protected $callee;
 
     /**
+     * 设置被叫
      * @param string $callee
      * @return $this
      */
@@ -296,7 +297,6 @@ class FreeSwitch
      * @return $this
      * @throws InvalidFreeSwitchConnectionException
      * @throws InvalidGatewayException
-     * @throws Exception
      */
     public function startCall(string $caller = null, string $callee = null)
     {
@@ -304,9 +304,9 @@ class FreeSwitch
 
         $callee && $this->setCallee($callee);
 
-        if (!$this->caller) throw new Exception('Invalid caller number');
+        if (!$this->caller) throw new \Exception('Invalid caller number');
 
-        if (!$this->callee) throw new Exception('Invalid callee number');
+        if (!$this->callee) throw new \Exception('Invalid callee number');
 
         // 检测网关可用
         if (!is_null($this->gateway_name) && false === $this->getConnection()->checkGateway($this->gateway_name)) {

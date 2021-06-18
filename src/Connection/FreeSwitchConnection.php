@@ -102,9 +102,16 @@ class FreeSwitchConnection
 
         if ($connection instanceof Socket && isset($password) && $password !== '') {
             $auth_str = sprintf("auth %s\r\n\r\n", $password);
-            if (strlen($auth_str) != $connection->send($auth_str)) return false;
+            if (strlen($auth_str) != $connection->send($auth_str)) {
+                throw new InvalidFreeSwitchConnectionException(sprintf('FreeSWITCH connection failed(socketErrMsg:%s).', $connection->errMsg), $connection->errCode);
+            }
             while ($packet = $connection->recvPacket()) {
+
                 if (strpos((string)$packet, '+OK') !== false) break;
+
+                if (strpos((string)$packet, 'disconnect') !== false) {
+                    throw new InvalidFreeSwitchConnectionException(sprintf('FreeSWITCH connection failed(errorMsg:%s).', $connection->recv(67)));
+                }
             }
         }
 
@@ -180,7 +187,7 @@ class FreeSwitchConnection
 
             $socket->close();
 
-            throw new InvalidFreeSwitchConnectionException('FreeSWITCH connection failed.', $this->getErrCode());
+            throw new InvalidFreeSwitchConnectionException(sprintf('FreeSWITCH connection failed(socketErrMsg:%s).', $socket->errMsg), $socket->errCode);
         }
 
         return $socket;
