@@ -43,3 +43,6 @@ class example implements \FreeSwitch\Event\EventHandleInterface {
         $fs->eventListening($this); // 事件监听，并注入事件处理类(注意:监听事件是阻塞的)
     }
 }
+
+````
+``QQ:827871186``
