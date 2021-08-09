@@ -27,8 +27,8 @@ class FreeSwitchConnection
      */
     protected $config = [
         'host' => 'localhost',
-        'port' => '8022',
-        'password' => 'dgg@1234.',
+        'port' => '8021',
+        'password' => '',
         'timeout' => 0.5
     ];
 
