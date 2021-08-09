@@ -252,4 +252,26 @@ trait Api
         if (strpos($gateway_status, 'Invalid') !== false) return false;
         return $gateway_status;
     }
+
+    /**
+     * 广播
+     * @param string $uuid
+     * @param string $audio_path
+     * @param string $legIdx
+     * @return bool
+     */
+    public function uuidBroadcast(string $uuid, string $audio_path, string $legIdx = '')
+    {
+        return $this->bgapi("uuid_broadcast", sprintf("%s %s %s", $uuid, $audio_path, $legIdx));
+    }
+
+    /**
+     * 结束广播
+     * @param string $uuid
+     * @return bool
+     */
+    public function uuidBreak(string $uuid)
+    {
+        return $this->bgapi("uuid_break", sprintf("%s all", $uuid));
+    }
 }
